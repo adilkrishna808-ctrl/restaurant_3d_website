@@ -8,6 +8,7 @@ import { useState } from 'react';
  * - Warm gold accents (#d4af37) and deep charcoal (#1a1a1a)
  * - Smooth scroll-triggered animations with 30fps optimization
  * - Parallax effects and subtle depth perception
+ * - Transparent backgrounds with premium background images
  */
 
 interface DishData {
@@ -44,6 +45,12 @@ const dishes: DishData[] = [
     price: '$24',
     ingredients: ['Dark Chocolate', 'Berries', 'Gold Leaf', 'Cream'],
   },
+];
+
+const backgroundImages = [
+  'https://d2xsxph8kpxj0f.cloudfront.net/310519663702079934/GHJwBSp89WRbKjoHuBpq4B/dish-bg-foie-gras-hq2TBdBqSPLPza5ptWGYF6.webp',
+  'https://d2xsxph8kpxj0f.cloudfront.net/310519663702079934/GHJwBSp89WRbKjoHuBpq4B/dish-bg-scallops-eDMMYZ6cvmoLMpyn4E9DaU.webp',
+  'https://d2xsxph8kpxj0f.cloudfront.net/310519663702079934/GHJwBSp89WRbKjoHuBpq4B/dish-bg-dessert-ebzyBXFGhrxjrtTbnKdG9b.webp',
 ];
 
 function HeroSection() {
@@ -102,10 +109,16 @@ function DishCard({ dish, index }: { dish: DishData; index: number }) {
       ref={ref}
       className="relative py-20 px-6 md:px-12 overflow-hidden"
       style={{
-        backgroundColor: isEven ? '#f5f3f0' : '#ffffff',
+        backgroundImage: `url('${backgroundImages[index]}')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed',
       }}
     >
-      <div className="max-w-7xl mx-auto">
+      {/* Semi-transparent overlay for better text readability */}
+      <div className="absolute inset-0 bg-black/20" />
+
+      <div className="relative z-10 max-w-7xl mx-auto">
         <div
           className={`grid grid-cols-1 md:grid-cols-2 gap-12 items-center ${
             isEven ? '' : 'md:grid-flow-dense'
@@ -113,7 +126,7 @@ function DishCard({ dish, index }: { dish: DishData; index: number }) {
         >
           {/* Image Container */}
           <div
-            className="relative h-96 md:h-full min-h-96 rounded-lg overflow-hidden shadow-2xl"
+            className="relative h-96 md:h-full min-h-96 rounded-lg overflow-hidden shadow-2xl bg-white/10 backdrop-blur-sm"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             style={{
@@ -141,7 +154,7 @@ function DishCard({ dish, index }: { dish: DishData; index: number }) {
 
           {/* Content Container */}
           <div
-            className={`space-y-6 ${isEven ? '' : 'md:col-start-1'}`}
+            className={`space-y-6 bg-white/95 backdrop-blur-md p-8 rounded-lg ${isEven ? '' : 'md:col-start-1'}`}
             style={{
               opacity: 0.5 + scrollProgress * 0.5,
               transform: `translateX(${(1 - scrollProgress) * (isEven ? -30 : 30)}px)`,
@@ -170,9 +183,8 @@ function DishCard({ dish, index }: { dish: DishData; index: number }) {
                 {dish.ingredients.map((ingredient, i) => (
                   <span
                     key={i}
-                    className="px-4 py-2 rounded-full text-sm font-light"
+                    className="px-4 py-2 rounded-full text-sm font-light bg-gradient-to-r from-amber-50 to-yellow-50"
                     style={{
-                      backgroundColor: '#f0ede8',
                       color: '#1a1a1a',
                       border: '1px solid #d4af37',
                     }}
@@ -193,7 +205,7 @@ function DishCard({ dish, index }: { dish: DishData; index: number }) {
             </div>
 
             <button
-              className="mt-8 px-8 py-3 rounded-lg font-semibold transition-all duration-300"
+              className="mt-8 px-8 py-3 rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
               style={{
                 backgroundColor: '#1a1a1a',
                 color: '#ffffff',
@@ -210,7 +222,7 @@ function DishCard({ dish, index }: { dish: DishData; index: number }) {
 
       {/* Decorative divider */}
       <div
-        className="absolute bottom-0 left-0 right-0 h-1"
+        className="absolute bottom-0 left-0 right-0 h-1 z-20"
         style={{ backgroundColor: '#d4af37', opacity: 0.3 }}
       />
     </section>
@@ -223,7 +235,7 @@ function RestaurantInfo() {
   return (
     <section
       ref={ref}
-      className="py-20 px-6 md:px-12 bg-white"
+      className="py-20 px-6 md:px-12 bg-white/95 backdrop-blur-sm"
     >
       <div className="max-w-4xl mx-auto text-center space-y-8">
         <div
@@ -293,52 +305,56 @@ function ContactSection() {
   return (
     <section
       ref={ref}
-      className="py-20 px-6 md:px-12"
+      className="py-20 px-6 md:px-12 relative overflow-hidden"
       style={{
         backgroundColor: '#1a1a1a',
       }}
     >
-      <div className="max-w-4xl mx-auto text-center space-y-8">
-        <h2 className="text-5xl md:text-6xl font-bold text-white mb-6">
-          Reserve Your Table
-        </h2>
-        <p className="text-xl text-gray-300 font-light">
-          Experience an unforgettable evening of culinary artistry
-        </p>
+      {/* Dark gradient overlay for depth */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-black/40" />
+      <div className="relative z-10">
+        <div className="max-w-4xl mx-auto text-center space-y-8">
+          <h2 className="text-5xl md:text-6xl font-bold text-white mb-6 drop-shadow-lg">
+            Reserve Your Table
+          </h2>
+          <p className="text-xl text-gray-300 font-light">
+            Experience an unforgettable evening of culinary artistry
+          </p>
 
-        <div
-          className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12"
-          style={{
-            opacity: 0.5 + scrollProgress * 0.5,
-            transform: `translateY(${(1 - scrollProgress) * 30}px)`,
-            transition: 'all 0.3s ease-out',
-          }}
-        >
-          {[
-            { label: 'Phone', value: '+1 (555) 123-4567' },
-            { label: 'Email', value: 'reservations@restaurant.com' },
-            { label: 'Hours', value: 'Tue-Sun 6PM - 11PM' },
-          ].map((item, i) => (
-            <div key={i} className="space-y-2">
-              <p className="text-sm font-semibold text-gray-400 uppercase tracking-wider">
-                {item.label}
-              </p>
-              <p className="text-lg text-white font-light">{item.value}</p>
-            </div>
-          ))}
+          <div
+            className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12"
+            style={{
+              opacity: 0.5 + scrollProgress * 0.5,
+              transform: `translateY(${(1 - scrollProgress) * 30}px)`,
+              transition: 'all 0.3s ease-out',
+            }}
+          >
+            {[
+              { label: 'Phone', value: '+1 (555) 123-4567' },
+              { label: 'Email', value: 'reservations@restaurant.com' },
+              { label: 'Hours', value: 'Tue-Sun 6PM - 11PM' },
+            ].map((item, i) => (
+              <div key={i} className="space-y-2">
+                <p className="text-sm font-semibold text-gray-400 uppercase tracking-wider">
+                  {item.label}
+                </p>
+                <p className="text-lg text-white font-light">{item.value}</p>
+              </div>
+            ))}
+          </div>
+
+          <button
+            className="mt-12 px-12 py-4 rounded-lg font-semibold text-lg transition-all duration-300"
+            style={{
+              backgroundColor: '#d4af37',
+              color: '#1a1a1a',
+            }}
+            onMouseEnter={handleBookButtonMouseEnter}
+            onMouseLeave={handleBookButtonMouseLeave}
+          >
+            Book Now
+          </button>
         </div>
-
-        <button
-          className="mt-12 px-12 py-4 rounded-lg font-semibold text-lg transition-all duration-300"
-          style={{
-            backgroundColor: '#d4af37',
-            color: '#1a1a1a',
-          }}
-          onMouseEnter={handleBookButtonMouseEnter}
-          onMouseLeave={handleBookButtonMouseLeave}
-        >
-          Book Now
-        </button>
       </div>
     </section>
   );
