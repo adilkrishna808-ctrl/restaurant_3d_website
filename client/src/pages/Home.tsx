@@ -1,5 +1,5 @@
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 /**
  * Design Philosophy: Luxury Minimalism with Depth
@@ -9,6 +9,7 @@ import { useState } from 'react';
  * - Smooth scroll-triggered animations with 30fps optimization
  * - Parallax effects and subtle depth perception
  * - Transparent backgrounds with premium background images
+ * - Full-viewport dish showcase with popping-up animations
  */
 
 interface DishData {
@@ -86,11 +87,9 @@ function HeroSection() {
   );
 }
 
-function DishCard({ dish, index }: { dish: DishData; index: number }) {
-  const { ref, scrollProgress } = useScrollAnimation({ threshold: 0.3 });
+function DishShowcase({ dish, index }: { dish: DishData; index: number }) {
+  const { ref, scrollProgress } = useScrollAnimation({ threshold: 0.1 });
   const [isHovered, setIsHovered] = useState(false);
-
-  const isEven = index % 2 === 0;
 
   const handleButtonMouseEnter = (e: React.MouseEvent<HTMLButtonElement>) => {
     const target = e.target as HTMLElement;
@@ -104,10 +103,31 @@ function DishCard({ dish, index }: { dish: DishData; index: number }) {
     target.style.color = '#ffffff';
   };
 
+  // Calculate visibility: each dish is visible for about 1 viewport height
+  // Dish 0: 0-1, Dish 1: 1-2, Dish 2: 2-3
+  const dishStart = index;
+  const dishEnd = index + 1;
+  
+  // Clamp progress to this dish's range
+  const dishProgress = Math.max(0, Math.min(1, scrollProgress - dishStart));
+  
+  // Opacity: fade in at start, fade out at end
+  const opacity = dishProgress < 0.2 
+    ? dishProgress * 5  // Fade in over first 20%
+    : dishProgress > 0.8 
+    ? (1 - dishProgress) * 5  // Fade out over last 20%
+    : 1;
+
+  // Scale: pop in from small to full size
+  const scale = 0.8 + dishProgress * 0.2;
+  
+  // Rotation: slight 3D rotation
+  const rotationY = (1 - dishProgress) * 15;
+
   return (
     <section
       ref={ref}
-      className="relative py-20 px-6 md:px-12 overflow-hidden"
+      className="relative min-h-screen w-full overflow-hidden flex items-center justify-center"
       style={{
         backgroundImage: `url('${backgroundImages[index]}')`,
         backgroundSize: 'cover',
@@ -115,116 +135,130 @@ function DishCard({ dish, index }: { dish: DishData; index: number }) {
         backgroundAttachment: 'fixed',
       }}
     >
-      {/* Semi-transparent overlay for better text readability */}
-      <div className="absolute inset-0 bg-black/20" />
+      {/* Semi-transparent overlay */}
+      <div className="absolute inset-0 bg-black/25" />
 
-      <div className="relative z-10 max-w-7xl mx-auto">
-        <div
-          className={`grid grid-cols-1 md:grid-cols-2 gap-12 items-center ${
-            isEven ? '' : 'md:grid-flow-dense'
-          }`}
-        >
-          {/* Image Container */}
-          <div
-            className="relative h-96 md:h-full min-h-96 rounded-lg overflow-hidden shadow-2xl bg-white/10 backdrop-blur-sm"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-            style={{
-              transform: `scale(${1 + scrollProgress * 0.05}) rotateY(${scrollProgress * 5}deg)`,
-              transition: 'transform 0.3s ease-out',
-              perspective: '1000px',
-            }}
-          >
-            <img
-              src={dish.image}
-              alt={dish.name}
-              className="w-full h-full object-cover"
-              style={{
-                filter: isHovered ? 'brightness(1.1)' : 'brightness(1)',
-                transform: `scale(${isHovered ? 1.05 : 1})`,
-                transition: 'all 0.4s cubic-bezier(0.23, 1, 0.32, 1)',
-              }}
-            />
-            {/* Gold accent border */}
+      {/* Dish Content Container */}
+      <div
+        className="relative z-10 w-full px-6 md:px-12"
+        style={{
+          opacity,
+          transform: `scale(${scale}) perspective(1000px) rotateY(${rotationY}deg)`,
+          transition: 'transform 0.1s linear, opacity 0.1s linear',
+        }}
+      >
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            {/* Image Container */}
             <div
-              className="absolute inset-0 border-2"
-              style={{ borderColor: '#d4af37', opacity: scrollProgress * 0.5 }}
-            />
-          </div>
-
-          {/* Content Container */}
-          <div
-            className={`space-y-6 bg-white/95 backdrop-blur-md p-8 rounded-lg ${isEven ? '' : 'md:col-start-1'}`}
-            style={{
-              opacity: 0.5 + scrollProgress * 0.5,
-              transform: `translateX(${(1 - scrollProgress) * (isEven ? -30 : 30)}px)`,
-              transition: 'all 0.3s ease-out',
-            }}
-          >
-            <div>
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-2">
-                {dish.name}
-              </h2>
+              className="relative h-96 md:h-full min-h-96 rounded-lg overflow-hidden shadow-2xl bg-white/10 backdrop-blur-sm"
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
+              style={{
+                transform: `scale(${1 + dishProgress * 0.08})`,
+                transition: 'transform 0.3s ease-out',
+              }}
+            >
+              <img
+                src={dish.image}
+                alt={dish.name}
+                className="w-full h-full object-cover"
+                style={{
+                  filter: isHovered ? 'brightness(1.15) saturate(1.1)' : 'brightness(1)',
+                  transform: `scale(${isHovered ? 1.08 : 1})`,
+                  transition: 'all 0.4s cubic-bezier(0.23, 1, 0.32, 1)',
+                }}
+              />
+              {/* Gold accent border */}
               <div
-                className="h-1 w-24 rounded-full"
-                style={{ backgroundColor: '#d4af37' }}
+                className="absolute inset-0 border-2"
+                style={{
+                  borderColor: '#d4af37',
+                  opacity: 0.3 + dishProgress * 0.4,
+                  boxShadow: `inset 0 0 40px rgba(212, 175, 55, ${0.1 + dishProgress * 0.2})`,
+                }}
               />
             </div>
 
-            <p className="text-lg text-gray-700 leading-relaxed font-light">
-              {dish.description}
-            </p>
-
-            <div className="space-y-3">
-              <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wider">
-                Ingredients
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {dish.ingredients.map((ingredient, i) => (
-                  <span
-                    key={i}
-                    className="px-4 py-2 rounded-full text-sm font-light bg-gradient-to-r from-amber-50 to-yellow-50"
-                    style={{
-                      color: '#1a1a1a',
-                      border: '1px solid #d4af37',
-                    }}
-                  >
-                    {ingredient}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            <div className="pt-4">
-              <span
-                className="text-3xl font-bold"
-                style={{ color: '#d4af37' }}
-              >
-                {dish.price}
-              </span>
-            </div>
-
-            <button
-              className="mt-8 px-8 py-3 rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
+            {/* Content Container */}
+            <div
+              className="space-y-6 bg-white/95 backdrop-blur-md p-8 rounded-lg"
               style={{
-                backgroundColor: '#1a1a1a',
-                color: '#ffffff',
-                transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+                transform: `translateX(${(1 - dishProgress) * -40}px)`,
+                transition: 'transform 0.3s ease-out',
               }}
-              onMouseEnter={handleButtonMouseEnter}
-              onMouseLeave={handleButtonMouseLeave}
             >
-              Reserve Now
-            </button>
+              <div>
+                <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-2">
+                  {dish.name}
+                </h2>
+                <div
+                  className="h-1 w-24 rounded-full"
+                  style={{
+                    backgroundColor: '#d4af37',
+                    boxShadow: `0 0 20px rgba(212, 175, 55, ${0.3 + dishProgress * 0.5})`,
+                  }}
+                />
+              </div>
+
+              <p className="text-lg text-gray-700 leading-relaxed font-light">
+                {dish.description}
+              </p>
+
+              <div className="space-y-3">
+                <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wider">
+                  Ingredients
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {dish.ingredients.map((ingredient, i) => (
+                    <span
+                      key={i}
+                      className="px-4 py-2 rounded-full text-sm font-light bg-gradient-to-r from-amber-50 to-yellow-50"
+                      style={{
+                        color: '#1a1a1a',
+                        border: '1px solid #d4af37',
+                        opacity: 0.6 + dishProgress * 0.4,
+                        transform: `translateY(${(1 - dishProgress) * 10}px)`,
+                        transition: 'all 0.3s ease-out',
+                        transitionDelay: `${i * 30}ms`,
+                      }}
+                    >
+                      {ingredient}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="pt-4">
+                <span
+                  className="text-3xl font-bold"
+                  style={{
+                    color: '#d4af37',
+                    opacity: 0.6 + dishProgress * 0.4,
+                    transition: 'opacity 0.3s ease-out',
+                  }}
+                >
+                  {dish.price}
+                </span>
+              </div>
+
+              <button
+                className="mt-8 px-8 py-3 rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
+                style={{
+                  backgroundColor: '#1a1a1a',
+                  color: '#ffffff',
+                  transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+                  opacity: 0.6 + dishProgress * 0.4,
+                }}
+                onMouseEnter={handleButtonMouseEnter}
+                onMouseLeave={handleButtonMouseLeave}
+              >
+                Reserve Now
+              </button>
+            </div>
           </div>
         </div>
       </div>
-
-      {/* Decorative divider */}
-      <div
-        className="absolute bottom-0 left-0 right-0 h-1 z-20"
-        style={{ backgroundColor: '#d4af37', opacity: 0.3 }}
-      />
     </section>
   );
 }
@@ -365,7 +399,7 @@ export default function Home() {
     <div className="w-full overflow-x-hidden">
       <HeroSection />
       {dishes.map((dish, index) => (
-        <DishCard key={dish.id} dish={dish} index={index} />
+        <DishShowcase key={dish.id} dish={dish} index={index} />
       ))}
       <RestaurantInfo />
       <ContactSection />
