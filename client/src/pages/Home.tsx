@@ -1,5 +1,5 @@
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 /**
  * Design Philosophy: Luxury Minimalism with Depth
@@ -46,12 +46,57 @@ const dishes: DishData[] = [
     price: '$24',
     ingredients: ['Dark Chocolate', 'Berries', 'Gold Leaf', 'Cream'],
   },
+  {
+    id: 4,
+    name: 'A5 Wagyu Perfection',
+    description: 'Exquisite A5 Japanese Wagyu beef, perfectly seared with a golden crust, served with seasonal vegetables and artisan sauce. The pinnacle of beef excellence.',
+    image: 'https://d2xsxph8kpxj0f.cloudfront.net/310519663702079934/GHJwBSp89WRbKjoHuBpq4B/dish-4-wagyu-JGzJ5E8xHGzSJ9XjZ9apmJ.webp',
+    price: '$85',
+    ingredients: ['A5 Wagyu', 'Microgreens', 'Edible Flowers', 'Gold Leaf', 'Seasonal Vegetables'],
+  },
+  {
+    id: 5,
+    name: 'Butter-Poached Maine Lobster',
+    description: 'Succulent Maine lobster tail, split and fanned, served with champagne foam and caviar pearls. An oceanic masterpiece.',
+    image: 'https://d2xsxph8kpxj0f.cloudfront.net/310519663702079934/GHJwBSp89WRbKjoHuBpq4B/dish-5-lobster-L7AkJHDHmTiGSGRQsLT73s.webp',
+    price: '$72',
+    ingredients: ['Maine Lobster', 'Champagne Foam', 'Caviar', 'Microgreens', 'Gold Leaf'],
+  },
+  {
+    id: 6,
+    name: 'Black Truffle Risotto',
+    description: 'Creamy Arborio risotto infused with black truffle, topped with shaved white truffle and parmigiano-reggiano. Pure luxury in every spoonful.',
+    image: 'https://d2xsxph8kpxj0f.cloudfront.net/310519663702079934/GHJwBSp89WRbKjoHuBpq4B/dish-6-truffle-mMmnqBacs7PCyuedU6tjzK.webp',
+    price: '$64',
+    ingredients: ['Black Truffle', 'White Truffle', 'Arborio Rice', 'Parmigiano-Reggiano', 'Edible Flowers'],
+  },
+  {
+    id: 7,
+    name: 'Seared Venison Loin',
+    description: 'Perfectly seared venison loin with cherry gastrique and silky red wine reduction. A sophisticated game meat presentation with artistic plating.',
+    image: 'https://d2xsxph8kpxj0f.cloudfront.net/310519663702079934/GHJwBSp89WRbKjoHuBpq4B/dish-7-venison-JnwrHe7rXA678vEMQfFg4n.webp',
+    price: '$68',
+    ingredients: ['Venison Loin', 'Cherry Gastrique', 'Red Wine Reduction', 'Microgreens', 'Gold Leaf'],
+  },
+  {
+    id: 8,
+    name: 'Grand Marnier Chocolate Soufflé',
+    description: 'Perfectly risen Grand Marnier chocolate soufflé with molten center, served with vanilla bean ice cream and berry coulis. An elegant finale.',
+    image: 'https://d2xsxph8kpxj0f.cloudfront.net/310519663702079934/GHJwBSp89WRbKjoHuBpq4B/dish-8-souffle-KbtdqkHTxuKPDkA4ZLJnuF.webp',
+    price: '$28',
+    ingredients: ['Dark Chocolate', 'Grand Marnier', 'Eggs', 'Vanilla Bean Ice Cream', 'Berries'],
+  },
 ];
 
 const backgroundImages = [
   'https://d2xsxph8kpxj0f.cloudfront.net/310519663702079934/GHJwBSp89WRbKjoHuBpq4B/dish-bg-foie-gras-hq2TBdBqSPLPza5ptWGYF6.webp',
   'https://d2xsxph8kpxj0f.cloudfront.net/310519663702079934/GHJwBSp89WRbKjoHuBpq4B/dish-bg-scallops-eDMMYZ6cvmoLMpyn4E9DaU.webp',
   'https://d2xsxph8kpxj0f.cloudfront.net/310519663702079934/GHJwBSp89WRbKjoHuBpq4B/dish-bg-dessert-ebzyBXFGhrxjrtTbnKdG9b.webp',
+  'https://d2xsxph8kpxj0f.cloudfront.net/310519663702079934/GHJwBSp89WRbKjoHuBpq4B/dish-bg-wagyu-MLWZrnX2DQCEqgAp2qnq7g.webp',
+  'https://d2xsxph8kpxj0f.cloudfront.net/310519663702079934/GHJwBSp89WRbKjoHuBpq4B/dish-bg-lobster-Fknuui2Yx7tFsyPungB7Po.webp',
+  'https://d2xsxph8kpxj0f.cloudfront.net/310519663702079934/GHJwBSp89WRbKjoHuBpq4B/dish-bg-truffle-CRfV6bwTZohqf92dxMnxnd.webp',
+  'https://d2xsxph8kpxj0f.cloudfront.net/310519663702079934/GHJwBSp89WRbKjoHuBpq4B/dish-bg-venison-WuUMRQ2pEqLHmpohZD5U2y.webp',
+  'https://d2xsxph8kpxj0f.cloudfront.net/310519663702079934/GHJwBSp89WRbKjoHuBpq4B/dish-bg-souffle-HaVYmy34imKQgxcEoqiytW.webp',
 ];
 
 function HeroSection() {
@@ -104,7 +149,6 @@ function DishShowcase({ dish, index }: { dish: DishData; index: number }) {
   };
 
   // Calculate visibility: each dish is visible for about 1 viewport height
-  // Dish 0: 0-1, Dish 1: 1-2, Dish 2: 2-3
   const dishStart = index;
   const dishEnd = index + 1;
   
@@ -129,7 +173,7 @@ function DishShowcase({ dish, index }: { dish: DishData; index: number }) {
       ref={ref}
       className="relative min-h-screen w-full overflow-hidden flex items-center justify-center"
       style={{
-        backgroundImage: `url('${backgroundImages[index]}')`,
+        backgroundImage: `url('${backgroundImages[index % backgroundImages.length]}')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed',
